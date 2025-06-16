@@ -1,13 +1,15 @@
-import { Controller, Get, InternalServerErrorException, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { SearchFlightDto } from './dto/search-flight.dto';
 import { Response, Request } from 'express';
 import { AppLoggerService } from 'src/logger/logger.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('flights')
 export class FlightsController {
     constructor(private readonly flightsService: FlightsService, private logger: AppLoggerService) { }
 
+    @UseGuards(JwtAuthGuard)
     @Get('search')
     async searchFlights(@Query() query: SearchFlightDto, @Res() res: Response, @Req() req: Request) {
         const { origin, destination, date, passengers } = query;
