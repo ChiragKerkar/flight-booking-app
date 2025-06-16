@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Flight {
+  id               Int                    @id @default(autoincrement())
+  airline          String
+  airline_code     String
+  flight_number    Int
+  origin           String
+  destination      String
+  available_seats  Int
+  price            Decimal
+  departure        DateTime
+  arrival          DateTime
+  duration         String
+
+  operationalDays  FlightOperationalDay[]
+  bookings         Booking[]
+}
+
+model FlightOperationalDay {
+  id        Int    @id @default(autoincrement())
+  flight    Flight @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  flightId  Int
+  day       Int     // 0 = Sunday, ..., 6 = Saturday
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String    // hashed
+  bookings  Booking[]
+}
+
+model Booking {
+  id              Int          @id @default(autoincrement())
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  flight          Flight       @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  flightId        Int
+  number_of_seats Int
+  booking_date    DateTime     @default(now())
+
+  passengers      Passenger[]
+}
+
+model Passenger {
+  id         Int      @id @default(autoincrement())
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId  Int
+  name       String
+  age        Int
+  gender     String
+}
+
+model audit_trail {
+  id         Int      @id @default(autoincrement())
+  level      String
+  message    String
+  file       String
+  created_at DateTime @default(now())
+}
