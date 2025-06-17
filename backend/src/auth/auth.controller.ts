@@ -2,6 +2,7 @@ import { Controller, Post, Body, Request, UseGuards, UnauthorizedException, Inte
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { AppLoggerService } from 'src/logger/logger.service';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,13 +25,11 @@ export class AuthController {
     }
 
     @Post('login')
-    async login(@Body() body: { email: string, password: string }) {
+    async login(@Body() body: LoginDto) {
         try {
-
             const user = await this.authService.validateUser(body.email, body.password);
             if (!user) throw new UnauthorizedException('Invalid credentials');
             return this.authService.login(user);
-
         } catch (error) {
             this.logger.error(
                 'AuthController: Failed to login user.',
