@@ -19,7 +19,7 @@ export class AuthService {
             const user = await this.prisma.user.create({
                 data: { email, password: hashedPassword, name },
             });
-            return { message: 'User registered successfully', userId: user.id };
+            return { message: 'User registered successfully'};
         } catch (error) {
             throw new InternalServerErrorException('Failed to register user.');
         }
