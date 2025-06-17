@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
             loginModal.classList.remove("show");
             appContent.style.display = "flex"; // Ensure #appContent exists and is hidden initially
             updateNavAfterLogin(); // This should update nav UI (like hiding Login/Register)
-
+            await populateOriginsAndDestinations(data.access_token);
             showToast("Login successful!");
         } catch (error) {
             showToast(error.message || "Login failed", true);
@@ -77,4 +77,37 @@ document.addEventListener("DOMContentLoaded", function () {
             toast.remove();
         }, 3000);
     }
+
+    async function populateOriginsAndDestinations(token) {
+        try {
+            const originsRes = await apiRequest('/flights/origins', 'GET', null, token);
+            const destinationsRes = await apiRequest('/flights/destinations', 'GET', null, token);
+
+            const originSelect = document.getElementById('origin');
+            const destinationSelect = document.getElementById('destination');
+
+            // Clear previous options except default
+            originSelect.length = 1;
+            destinationSelect.length = 1;
+
+            originsRes.data.forEach(origin => {
+                const opt = document.createElement('option');
+                opt.value = origin;
+                opt.textContent = origin;
+                originSelect.appendChild(opt);
+            });
+
+            destinationsRes.data.forEach(dest => {
+                const opt = document.createElement('option');
+                opt.value = dest;
+                opt.textContent = dest;
+                destinationSelect.appendChild(opt);
+            });
+
+        } catch (err) {
+            console.error('Failed to populate airports:', err);
+            showToast('Could not load origins/destinations', true);
+        }
+    }
+
 });
