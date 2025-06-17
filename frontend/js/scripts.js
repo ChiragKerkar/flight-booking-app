@@ -1,6 +1,16 @@
 import { apiRequest } from "./api.js";
 
 document.addEventListener("DOMContentLoaded", function () {
+    (async () => {
+        const isValid = await validateToken();
+
+        // if (!isValid) {
+        //     window.location.href = `${window.APP_CONFIG.UI_BASE_URL}/login.html`;
+        //     return;
+        // }
+
+        document.getElementById("appContent").style.display = "flex";
+    })();
     const tabs = document.querySelectorAll(".tab");
     const contents = document.querySelectorAll(".tab-content");
 
@@ -19,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeLogin = document.getElementById("closeLogin");
     const loginForm = document.getElementById("loginForm");
     const appContent = document.getElementById("appContent");
+    const searchForm = document.getElementById("searchForm");
 
     // Show modal if not logged in
     const token = localStorage.getItem("access_token");
@@ -63,6 +74,41 @@ document.addEventListener("DOMContentLoaded", function () {
             showToast(error.message || "Login failed", true);
         }
     });
+
+    searchForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const origin = document.getElementById("origin").value;
+        const destination = document.getElementById("destination").value;
+        const departureDate = document.getElementById("departureDate").value;
+        const passengers = document.getElementById("passengers").value;
+
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+            showToast("You must login to search flights", true);
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams({
+                origin,
+                destination,
+                date: departureDate,
+                passengers
+            });
+
+            const res = await apiRequest(`/flights/search?${params.toString()}`, "GET", null, token);
+            const totalFlights = res.totalItems || 0;
+            showToast(`Fetched ${totalFlights} flight${totalFlights === 1 ? '' : 's'}`);
+            displayFlights(res.data); // ✅ Helper to render flights
+
+        } catch (error) {
+            showToast(error.message || "Flight search failed", true);
+        }
+    });
+
+
 
     function showToast(message, type = "success") {
         const toast = document.createElement("div");
@@ -110,4 +156,55 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    async function displayFlights(flights) {
+        const container = document.getElementById("flightResults");
+        container.innerHTML = ""; // Clear previous results
+
+        if (flights.length === 0) {
+            container.innerHTML = "<p>No flights found.</p>";
+            return;
+        }
+
+        flights.forEach(flight => {
+            const card = document.createElement("div");
+            card.className = "flight-card";
+
+            const departureTime = new Date(flight.departure).toLocaleTimeString([], {
+                hour: "2-digit", minute: "2-digit", hour12: true
+            });
+
+            const arrivalTime = new Date(flight.arrival).toLocaleTimeString([], {
+                hour: "2-digit", minute: "2-digit", hour12: true
+            });
+
+            card.innerHTML = `
+            <div class="card-left">
+                <h2 class="flight-price">₹${flight.price}</h2>
+                <p class="flight-name">${flight.airline} (${flight.airline_code}${flight.flight_number})</p>
+                <p class="flight-route">${flight.origin} → ${flight.destination}</p>
+                <p>Depart: ${departureTime}</p>
+                <p>Arrive: ${arrivalTime}</p>
+            </div>
+            <div class="card-right">
+                <button class="book-btn">Book this ticket</button>
+            </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    async function validateToken() {
+        const token = localStorage.getItem("access_token");
+        if (!token) return false;
+
+        try {
+
+            await apiRequest('/auth/profile', 'GET', null, token); // Will throw if token is invalid
+            return true;
+        } catch (err) {
+            console.error("Token validation failed:", err.message);
+            localStorage.removeItem("access_token");
+            return false;
+        }
+    }
 });

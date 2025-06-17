@@ -48,7 +48,8 @@ body {
   margin-bottom: 1rem;
 }
 
-.filters select, input {
+.filters select,
+input {
   width: 100%;
   padding: 0.5rem;
   margin-top: 0.3rem;
@@ -176,6 +177,7 @@ body {
   font-size: 14px;
   outline: none;
 }
+
 .modal-form input:focus {
   border-color: #007bff;
 }
@@ -192,6 +194,7 @@ body {
   cursor: pointer;
   font-size: 16px;
 }
+
 .login-btn:hover {
   background-color: #0056b3;
 }
@@ -205,6 +208,7 @@ body {
   color: #888;
   cursor: pointer;
 }
+
 .close:hover {
   color: red;
 }
@@ -235,6 +239,59 @@ body {
 
 .toast.error {
   background-color: #f44336;
+}
+
+.flight-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-left {
+  flex: 1;
+}
+
+.flight-price {
+  color: #00355a;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.flight-name {
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.flight-route {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-btn {
+  padding: 0.7rem 1.2rem;
+  background-color: #8bc63c;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.book-btn:hover {
+  background-color: #75aa2f;
 }
 
 @keyframes slideIn {
