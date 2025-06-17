@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, NotFound
 import { AppLoggerService } from 'src/logger/logger.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { CheckExistingBookingDto } from './dto/check-existing-booking.dto';
 
 @Injectable()
 export class BookingsService {
@@ -48,6 +49,33 @@ export class BookingsService {
         } catch (error) {
             throw new InternalServerErrorException({
                 message: 'Booking failed.',
+                error: error.message,
+            });
+        }
+    }
+
+    async hasExistingBooking(userId: number, dto: CheckExistingBookingDto) {
+        const { flightId, scheduledFlightDate } = dto;
+
+        try {
+            const flight = await this.prisma.flight.findUnique({
+                where: { id: flightId },
+            });
+
+            if (!flight) {
+                throw new NotFoundException('Flight not found');
+            }
+
+            return await this.prisma.booking.findFirst({
+                where: {
+                    userId,
+                    flightId,
+                    scheduled_flight_date: new Date(scheduledFlightDate),
+                },
+            });
+        } catch (error) {
+            throw new InternalServerErrorException({
+                message: 'Failed to check existing booking.',
                 error: error.message,
             });
         }
