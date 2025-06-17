@@ -1,10 +1,26 @@
 import { apiRequest } from "./api.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-    (async () => {
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
         const isValid = await validateToken();
-        document.getElementById("appContent").style.display = "flex";
-    })();
+        if (isValid) {
+            initApp(token); // 🚀 Initialize everything if token is valid
+        } else {
+            localStorage.removeItem("access_token");
+            document.getElementById("loginModal").classList.add("show");
+        }
+    } else {
+        document.getElementById("loginModal").classList.add("show");
+    }
+
+    // ✅ Show app content
+    document.getElementById("appContent").style.display = "flex";
+
+    // ✅ Re-fetch welcome info and dropdowns
+    await updateNavAfterLogin();
+    await populateOriginsAndDestinations(token);
     const tabs = document.querySelectorAll(".tab");
     let selectedTab = "oneway";
 
@@ -25,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const bookingForm = document.getElementById("bookingForm");
 
     // Show modal if not logged in
-    const token = localStorage.getItem("access_token");
     if (!token) {
         loginModal.classList.add("show");
     } else {
@@ -69,9 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Success actions
             localStorage.setItem("access_token", data.access_token);
             loginModal.classList.remove("show");
-            appContent.style.display = "flex"; // Ensure #appContent exists and is hidden initially
-            updateNavAfterLogin(); // This should update nav UI (like hiding Login/Register)
-            await populateOriginsAndDestinations(data.access_token);
+            await initApp(data.access_token); // ✅ clean and centralized
             showToast("Login successful!");
         } catch (error) {
             showToast(error.message || "Login failed", true);
@@ -265,4 +278,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
     }
+
+    async function initApp(token) {
+    document.getElementById("appContent").style.display = "flex";
+    await updateNavAfterLogin();
+    await populateOriginsAndDestinations(token);
+}
 });
