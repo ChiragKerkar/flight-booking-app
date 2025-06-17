@@ -54,6 +54,7 @@ model Booking {
   flightId        Int
   number_of_seats Int
   booking_date    DateTime     @default(now())
+  scheduled_flight_date DateTime
 
   passengers      Passenger[]
 }

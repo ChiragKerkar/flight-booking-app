@@ -61,7 +61,10 @@ export class FlightsService {
                 data: flights,
             };
         } catch (error) {
-            throw new InternalServerErrorException('Failed to fetch flights.');
+            throw new InternalServerErrorException({
+                message: 'Failed to fetch flights.',
+                error: error.message,
+            });
         }
     }
 }

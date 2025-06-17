@@ -34,8 +34,7 @@ export class FlightsController {
             throw new InternalServerErrorException({
                 message: 'Failed to fetch flights.',
                 error: error.message,
-            })
+            });
         }
-
     }
 }
