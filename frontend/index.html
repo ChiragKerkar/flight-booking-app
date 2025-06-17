@@ -53,6 +53,47 @@
         </section>
     </main>
 
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeBookingModal">&times;</span>
+            <h2 class="modal-title">Book Flight</h2>
+            <form id="bookingForm" class="modal-form">
+                <input type="hidden" id="flightId" />
+                <input type="hidden" id="scheduledFlightDate" />
+
+                <div class="form-group">
+                    <label>Number of Seats:
+                        <input type="number" id="seatCount" min="1" required />
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Passenger Name:
+                        <input type="text" id="passengerName" required />
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Age:
+                        <input type="number" id="passengerAge" required />
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender:
+                        <select id="passengerGender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </label>
+                </div>
+
+                <button type="submit" class="login-btn">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">

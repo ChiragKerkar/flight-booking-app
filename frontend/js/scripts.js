@@ -3,25 +3,17 @@ import { apiRequest } from "./api.js";
 document.addEventListener("DOMContentLoaded", function () {
     (async () => {
         const isValid = await validateToken();
-
-        // if (!isValid) {
-        //     window.location.href = `${window.APP_CONFIG.UI_BASE_URL}/login.html`;
-        //     return;
-        // }
-
         document.getElementById("appContent").style.display = "flex";
     })();
     const tabs = document.querySelectorAll(".tab");
-    const contents = document.querySelectorAll(".tab-content");
+    let selectedTab = "oneway";
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
             tabs.forEach(t => t.classList.remove("active"));
-            contents.forEach(c => c.classList.remove("active"));
 
             tab.classList.add("active");
-            const selectedTab = tab.getAttribute("data-tab");
-            document.getElementById(selectedTab + "Form").classList.add("active");
+            selectedTab = tab.getAttribute("data-tab");
         });
     });
 
@@ -30,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("loginForm");
     const appContent = document.getElementById("appContent");
     const searchForm = document.getElementById("searchForm");
+    const bookingForm = document.getElementById("bookingForm");
 
     // Show modal if not logged in
     const token = localStorage.getItem("access_token");
@@ -118,6 +111,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    bookingForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const token = localStorage.getItem("access_token");
+
+        const flightId = +document.getElementById("flightId").value;
+        const numberOfSeats = +document.getElementById("seatCount").value;
+        const scheduledFlightDate = document.getElementById("scheduledFlightDate").value;
+        const passengerName = document.getElementById("passengerName").value;
+        const passengerAge = +document.getElementById("passengerAge").value;
+        const passengerGender = document.getElementById("passengerGender").value;
+
+        const bookingData = {
+            flightId,
+            numberOfSeats,
+            scheduledFlightDate,
+            passengers: [
+                {
+                    name: passengerName,
+                    age: passengerAge,
+                    gender: passengerGender
+                }
+            ]
+        };
+
+        try {
+            await apiRequest("/bookings", "POST", bookingData, token);
+            showToast("Booking successful!");
+            document.getElementById("bookingModal").classList.remove("show"); // 🔁 Close modal
+            document.getElementById("bookingForm").reset(); // ✅ Clear form
+        } catch (err) {
+            showToast("Booking failed: " + err.message, true);
+        }
+    });
+
 
 
     function showToast(message, type = "success") {
@@ -196,12 +224,32 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p>Arrive: ${arrivalTime}</p>
             </div>
             <div class="card-right">
-                <button class="book-btn">Book this ticket</button>
+                <button class="book-btn" data-flight-id="${flight.id}" data-date="${flight.departure}">Book this ticket</button>
             </div>
             `;
             container.appendChild(card);
         });
     }
+
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("book-btn")) {
+            const flightId = e.target.getAttribute("data-flight-id");
+            const scheduledDate = e.target.getAttribute("data-date");
+            document.getElementById("flightId").value = flightId;
+            document.getElementById("scheduledFlightDate").value = scheduledDate;
+            document.getElementById("bookingModal").classList.add("show");
+        }
+    });
+
+    document.getElementById("closeBookingModal").addEventListener("click", () => {
+        document.getElementById("bookingModal").classList.remove("show");
+    });
+
+    document.getElementById("bookingModal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("bookingModal")) {
+            document.getElementById("bookingModal").classList.remove("show");
+        }
+    });
 
     async function validateToken() {
         const token = localStorage.getItem("access_token");
