@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flight Booking</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            ✈️ <span class="logo-text">Flight Search Engine</span>
+        </div>
+        <div class="nav-right">
+            <a href="#">Login</a>
+            <a href="#">Register</a>
+        </div>
+    </header>
+
+    <main class="container" id="appContent" style="display: none;">
+        <section class="filters">
+            <h2>Search Flights</h2>
+
+            <div class="tabs-nav">
+                <div class="tab active" data-tab="oneway">One Way</div>
+                <div class="tab" data-tab="return">Return</div>
+            </div>
+            <form id="searchForm">
+                <label>Origin:
+                    <input type="text" id="origin" required />
+                </label>
+                <label>Destination:
+                    <input type="text" id="destination" required />
+                </label>
+                <label>Departure Date:
+                    <input type="date" id="departureDate" required />
+                </label>
+                <label>Passengers:
+                    <input type="number" id="passengers" min="1" value="1" required />
+                </label>
+                <button type="submit">Search</button>
+            </form>
+        </section>
+
+        <section class="results" id="results">
+            <h2>Available Flights</h2>
+            <div id="flightResults"></div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeLogin">&times;</span>
+            <h2 class="modal-title">Login</h2>
+            <form id="loginForm" class="modal-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required />
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required />
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+    <div id="toastContainer"></div>
+    <script src="config.js"></script>
+    <script type="module" src="js/scripts.js"></script>
+</body>
+
+</html>

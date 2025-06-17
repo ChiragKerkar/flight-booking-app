@@ -67,4 +67,34 @@ export class FlightsService {
             });
         }
     }
+
+    async getDistinctOrigins(): Promise<string[]> {
+        try {
+            const origins = await this.prisma.flight.findMany({
+                distinct: ['origin'],
+                select: { origin: true },
+            });
+            return origins.map(o => o.origin);
+        } catch (error) {
+            throw new InternalServerErrorException({
+                message: 'Failed to fetch origins.',
+                error: error.message,
+            });
+        }
+    }
+
+    async getDistinctDestinations(): Promise<string[]> {
+        try {
+            const destinations = await this.prisma.flight.findMany({
+                distinct: ['destination'],
+                select: { destination: true },
+            });
+            return destinations.map(d => d.destination);
+        } catch (error) {
+            throw new InternalServerErrorException({
+                message: 'Failed to fetch destinations.',
+                error: error.message,
+            });
+        }
+    }
 }
