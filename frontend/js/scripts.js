@@ -50,8 +50,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Optional: remove Login/Register after login
-    function updateNavAfterLogin() {
-        document.querySelector(".nav-right").innerHTML = `<span>👤 Logged In</span>`;
+    async function updateNavAfterLogin() {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        try {
+            const profile = await apiRequest('/auth/profile', 'GET', null, token);
+            const email = profile?.email || "User";
+            document.getElementById("welcomeUser").innerHTML = `👋 Welcome, <strong>${email}</strong>!`;
+        } catch (err) {
+            console.error("Failed to fetch user profile:", err.message);
+            showToast("Failed to load user info", true);
+        }
     }
 
     // Login form
