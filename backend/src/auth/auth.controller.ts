@@ -8,6 +8,13 @@ import { LoginDto } from './dto/login.dto';
 export class AuthController {
     constructor(private authService: AuthService, private logger: AppLoggerService) { }
 
+    @Post('run-seeds')
+    async runAllSeeds() {
+        await import('../../prisma/seeders/seed');
+        await import('../../prisma/seeders/user.seed');
+        return { message: 'Seeds executed successfully' };
+    }
+
     @Post('register')
     async register(@Body() body: { email: string, password: string, name: string }) {
         try {
